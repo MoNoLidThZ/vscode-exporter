@@ -101,6 +101,7 @@ export class VSCodeExporter {
 
   private onDidChangeWindowState() {
     if (this.alwaysOn) {
+      this.startServer();
       return;
     }
     this.logger.info('window', 'focused', vscode.window.state.focused);
