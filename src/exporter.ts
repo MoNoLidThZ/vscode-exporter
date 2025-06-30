@@ -10,6 +10,8 @@ export class VSCodeExporter {
   private configId: string = 'VSCodeExporter';
 
   private port: number = 9931;
+  private alwaysOn: boolean = false;
+  private bindAddress: string = "127.0.0.1";
   private debug: boolean = false;
 
   private state: State;
@@ -24,6 +26,8 @@ export class VSCodeExporter {
     this.state = new State(logger);
     this.config = vscode.workspace.getConfiguration(this.configId);
     this.port = this.config.get('port', this.port);
+    this.alwaysOn = this.config.get('alwaysOn', false);
+    this.bindAddress = this.config.get('bindAddress', this.bindAddress);
     this.debug = this.config.get('debugLogs', this.debug);
     this.output = vscode.window.createOutputChannel(this.id);
     this.server = http.createServer(this.requestHandler.bind(this));
@@ -64,7 +68,9 @@ export class VSCodeExporter {
     subscriptions.push(windowExporter.setupEventListeners());
     subscriptions.push(workspaceExporter.setupEventListeners());
 
-    vscode.window.onDidChangeWindowState(this.onDidChangeWindowState, this, subscriptions);
+    if (!this.alwaysOn) {
+      vscode.window.onDidChangeWindowState(this.onDidChangeWindowState, this, subscriptions);
+    }
 
     this.disposable = vscode.Disposable.from(...subscriptions);
   }
@@ -82,8 +88,8 @@ export class VSCodeExporter {
   }
 
   private startServer(): void {
-    this.server.listen(this.port, () => {
-      this.logger.info('server listening', 'port', this.port);
+    this.server.listen(this.port, this.bindAddress, () => {
+      this.logger.info('server listening', 'port', this.port, 'address', this.bindAddress);
     });
   }
 
@@ -94,6 +100,9 @@ export class VSCodeExporter {
   }
 
   private onDidChangeWindowState() {
+    if (this.alwaysOn) {
+      return;
+    }
     this.logger.info('window', 'focused', vscode.window.state.focused);
     if (vscode.window.state.focused) {
       this.startServer();
