@@ -46,12 +46,12 @@
           "type": "number",
           "default": 9931,
           "description": "Metrics HTTP server port"
-        },"vscode-exporter.alwaysOn": {
+        },"VSCodeExporter.alwaysOn": {
           "type": "boolean",
           "default": false,
           "description": "If true, the exporter HTTP server will always be available, regardless of window focus."
         },
-        "vscode-exporter.bindAddress": {
+        "VSCodeExporter.bindAddress": {
           "type": "string",
           "default": "127.0.0.1",
           "description": "The address the exporter HTTP server will bind to. Use 0.0.0.0 to listen on all interfaces."
